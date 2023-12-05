@@ -4,7 +4,7 @@
   "description": "\"Backend service for ratings and reviews module\"",
   "main": "index.js",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "nodemon server/index.js",
     "dev-server": "nodemon ./server/index.js"
   },
   "repository": {
@@ -20,6 +20,16 @@
     "sequelize": "^6.35.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "eslint": "^8.55.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.1.0"
   }
 }
