@@ -133,3 +133,5 @@ dist
 .eslintrc.json
 
 .prettierrc
+
+/data
