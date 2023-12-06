@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('./server/db.js');
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("./server/db");
 
-const Review = sequelize.define('Review', {
+const Reviews = sequelize.define("Reviews", {
   review_id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -27,7 +27,7 @@ const Review = sequelize.define('Review', {
     allowNull: true,
   },
   recommended: {
-    type: DataTypes.STRING,
+    type: DataTypes.BOOLEAN,
     allowNull: false,
   },
   name: {
@@ -41,9 +41,11 @@ const Review = sequelize.define('Review', {
 });
 
 /* Reported Boolean Per Review */
-const Reported = sequelize.define('Reported', {
+const Reported = sequelize.define("Reported", {
   id: {
     type: DataTypes.INTEGER,
+    primaryKey: true,
+
     allowNull: false,
   },
   reported: {
@@ -53,9 +55,10 @@ const Reported = sequelize.define('Reported', {
 });
 
 /* Helpful Count Per Review */
-const Helpful = sequelize.define('Helpful', {
+const Helpful = sequelize.define("Helpful", {
   id: {
     type: DataTypes.INTEGER,
+    primaryKey: true,
     allowNull: false,
   },
   helpful: {
@@ -65,7 +68,7 @@ const Helpful = sequelize.define('Helpful', {
 });
 
 /* Photo URLs Per Review */
-const Photo = sequelize.define('Photo', {
+const Photo = sequelize.define("Photo", {
   photo_id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -83,9 +86,10 @@ const Photo = sequelize.define('Photo', {
 });
 
 /* Characteristic Rating (1-5) Per Review */
-const Characteristic = sequelize.define('Characteristic', {
+const Characteristic = sequelize.define("Characteristic", {
   id: {
     type: DataTypes.INTEGER,
+    primaryKey: true,
     allowNull: false,
   },
   size: {
@@ -115,7 +119,7 @@ const Characteristic = sequelize.define('Characteristic', {
 });
 
 /* Total Star Counts & Average Characteristics Ratings Per Product */
-const Meta = sequelize.define('Meta', {
+const Meta = sequelize.define("Meta", {
   product_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -196,22 +200,21 @@ const Meta = sequelize.define('Meta', {
     type: DataTypes.DECIMAL(16, 10),
     allowNull: false,
   },
-
 });
-/*  */
-Meta.hasMany(Review, { foreignKey: 'product_id' });
-Review.belongsTo(Meta, { foreignKey: 'product_id' });
 
-Review.hasOne(Reported, { foreignKey: 'review_id' });
-Reported.belongsTo(Review, { foreignKey: 'review_id' });
+Meta.hasMany(Reviews, { foreignKey: "product_id" });
+Reviews.belongsTo(Meta, { foreignKey: "product_id" });
 
-Review.hasOne(Helpful, { foreignKey: 'review_id' });
-Helpful.belongsTo(Review, { foreignKey: 'review_id' });
+Reviews.hasOne(Reported, { foreignKey: "review_id" });
+Reported.belongsTo(Reviews, { foreignKey: "review_id" });
 
-Review.hasOne(Characteristic,{ foreignKey: 'review_id' });
-Characteristic.belongsTo(Review, { foreignKey: 'review_id' });
+Reviews.hasOne(Helpful, { foreignKey: "review_id" });
+Helpful.belongsTo(Reviews, { foreignKey: "review_id" });
 
-Review.hasMany(Photo,{ foreignKey: 'review_id' });
-Photo.belongsTo(Review, { foreignKey: 'review_id' });
+Reviews.hasOne(Characteristic, { foreignKey: "review_id" });
+Characteristic.belongsTo(Reviews, { foreignKey: "review_id" });
 
-module.exports = { Review, Reported, Helpful, Characteristic, Photo, Meta };
+Reviews.hasMany(Photo, { foreignKey: "review_id" });
+Photo.belongsTo(Reviews, { foreignKey: "review_id" });
+
+module.exports = { Reviews, Reported, Helpful, Characteristic, Photo, Meta };
