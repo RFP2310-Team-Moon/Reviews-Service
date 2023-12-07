@@ -7,10 +7,7 @@ const Reviews = sequelize.define("Reviews", {
     autoIncrement: true,
     primaryKey: true,
   },
-  product_id: {
-    type: DataTypes.INTEGER,
-  },
-  date: {
+  createdAt: {
     type: DataTypes.BIGINT,
     allowNull: true,
   },
@@ -19,24 +16,24 @@ const Reviews = sequelize.define("Reviews", {
     allowNull: true,
   },
   summary: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(1000),
     allowNull: true,
   },
   body: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(1000),
     allowNull: true,
   },
-  recommended: {
+  recommend: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
+    allowNull: true,
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
+  reviewer_name: {
+    type: DataTypes.STRING(300),
+    allowNull: true,
   },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
+  reviewer_email: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
   },
 });
 
@@ -45,11 +42,10 @@ const Reported = sequelize.define("Reported", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-
     allowNull: false,
   },
   reported: {
-    type: DataTypes.SMALLINT,
+    type: DataTypes.BOOLEAN,
     allowNull: false,
   },
 });
@@ -73,10 +69,6 @@ const Photo = sequelize.define("Photo", {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
-    allowNull: false,
-  },
-  review_id: {
-    type: DataTypes.INTEGER,
     allowNull: false,
   },
   photo_url: {
