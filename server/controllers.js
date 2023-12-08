@@ -19,19 +19,20 @@ module.exports = {
         ORDER BY date ASC
         LIMIT ${count}
         OFFSET ${(page - 1) * count}`;
+      // CONCAT ALL PHOTO URLS BY REVIEW ID
+      const qString2 = `SELECT STRING_AGG(id || ', ' || url ,', '), review_id
+      FROM photos
+      WHERE review_id
+      IN (SELECT id
+      FROM reviews
+      WHERE product_id=${productId}
+      ORDER BY date ASC
+      LIMIT ${count}
+      OFFSET ${(page - 1) * count})
+      GROUP BY review_id;`;
 
-      /*
-        SELECT reviews.id AS "review_id", rating, summary, recommend, response, body, date, reviewer_name, helpfulness, photos.url
-        FROM reviews INNER JOIN photos ON review_id = photos.review_id
-        WHERE reviews.product_id=2
-        ORDER BY date ASC
-        LIMIT 5
-        OFFSET 0
-
-        Select STRING_AGG(p.id || ', ' || url ,', '), review_id from reviews inner join photos AS p ON reviews.id = p.review_id where product_id = 2 group by review_id;
-
-        SELECT p.review_id,
-        AVG(rating),
+      const qString3 = `SELECT reviews.id as review_id,
+        rating,
         summary,
         recommend,
         response,
@@ -39,31 +40,61 @@ module.exports = {
         date,
         reviewer_name,
         helpfulness,
-        STRING_AGG(p.id || ', ' || p.url, ', ')
+        STRING_AGG(p.id || ', ' || p.url ,', ') as photos
         FROM reviews
-        INNER JOIN photos as p
-        ON review_id = p.review_id
-        WHERE reviews.product_id=2
-        group by p.review_id, rating;
+        JOIN photos as p ON reviews.id=p.review_id
+        WHERE reviews.product_id=${productId}
+        GROUP BY reviews.id
+        ORDER BY date ASC
+        LIMIT ${count}
+        OFFSET ${(page - 1) * count};`;
+      /*
+      SELECT reviews.id,
+      rating,
+      summary,
+      recommend,
+      response,
+      body,
+      date,
+      reviewer_name,
+      STRING_AGG(p.id || ', ' || p.url ,', ')
+      FROM reviews
+      JOIN photos as p ON reviews.id=p.review_id
+      WHERE reviews.product_id=2
+      GROUP BY reviews.id
+      LIMIT 5
+      OFFSET 0
+      ;
 
+       */
 
-      */
-      const result = await pool.query(qString);
-      for (let i = 0; i < result.rows.length; i += 1) {
-        const date = moment(result.rows[i].date);
-        date = date.format("DD/MM/YYYY HH:mm:ss");
+      // const result = await pool.query(qString);
+      // const result2 = await pool.query(qString2);
+      const result3 = await pool.query(qString3);
+      console.log(result3.rows);
 
-        console.log(date);
-        result.rows[i].date = date;
-      }
-      const result2 = {
+      const final = {
         product: productId,
         page,
         count,
-        result: result.rows,
+        result: result3.rows,
       };
-      console.log(result.rows);
-      res.send(result2);
+
+      for (let j = 0; j < final.result.length; j += 1) {
+        if (final.result[j].photos !== "") {
+          const photoArr = [];
+          const idUrl = final.result[j].photos.split(", ");
+          for (let i = 0; i < idUrl.length; i += 2) {
+            photoArr.push({
+              id: Number(idUrl[i]),
+              url: idUrl[i + 1],
+            });
+          }
+          final.result[j].photos = photoArr;
+        }
+      }
+
+      res.send(final);
     } catch (err) {
       console.error(err);
     }

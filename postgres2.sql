@@ -25,6 +25,7 @@ CREATE TABLE "photos" (
   "url" TEXT
 );
 CREATE INDEX idx_review_id ON photos (review_id);
+CREATE INDEX idx_review_id ON photos (review_id);
 
 DROP TABLE IF EXISTS "chars";
 CREATE TABLE "chars" (
