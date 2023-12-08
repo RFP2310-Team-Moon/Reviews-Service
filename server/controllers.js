@@ -5,31 +5,18 @@ module.exports = {
       const productId = req.query.product_id;
       const page = req.query.page || 1;
       const count = req.query.count || 5;
-      const qString = `SELECT id,
-        rating,
-        summary,
-        recommend,
-        response,
-        body,
-        date,
-        reviewer_name,
-        helpfulness
-        FROM reviews
-        WHERE product_id=${productId}
-        ORDER BY date ASC
-        LIMIT ${count}
-        OFFSET ${(page - 1) * count}`;
-      // CONCAT ALL PHOTO URLS BY REVIEW ID
-      const qString2 = `SELECT STRING_AGG(id || ', ' || url ,', '), review_id
-      FROM photos
-      WHERE review_id
-      IN (SELECT id
-      FROM reviews
-      WHERE product_id=${productId}
-      ORDER BY date ASC
-      LIMIT ${count}
-      OFFSET ${(page - 1) * count})
-      GROUP BY review_id;`;
+      // // CONCAT ALL PHOTO URLS BY REVIEW ID
+      // const qString2 = `SELECT STRING_AGG(id || ', ' || url ,', '), review_id
+      // FROM photos
+      // WHERE review_id
+      // IN (SELECT id
+      // FROM reviews
+      // WHERE product_id=${productId}
+      // ORDER BY date ASC
+      // LIMIT ${count}
+      // OFFSET ${(page - 1) * count})
+      // GROUP BY review_id;`;
+      // STRING_AGG('{"id":' || p.id || ', "url":"' || p.url || '"}',', ') as photos
 
       const qString3 = `SELECT reviews.id as review_id,
         rating,
@@ -48,31 +35,7 @@ module.exports = {
         ORDER BY date ASC
         LIMIT ${count}
         OFFSET ${(page - 1) * count};`;
-      /*
-      SELECT reviews.id,
-      rating,
-      summary,
-      recommend,
-      response,
-      body,
-      date,
-      reviewer_name,
-      STRING_AGG(p.id || ', ' || p.url ,', ')
-      FROM reviews
-      JOIN photos as p ON reviews.id=p.review_id
-      WHERE reviews.product_id=2
-      GROUP BY reviews.id
-      LIMIT 5
-      OFFSET 0
-      ;
-
-       */
-
-      // const result = await pool.query(qString);
-      // const result2 = await pool.query(qString2);
       const result3 = await pool.query(qString3);
-      console.log(result3.rows);
-
       const final = {
         product: productId,
         page,
@@ -81,6 +44,10 @@ module.exports = {
       };
 
       for (let j = 0; j < final.result.length; j += 1) {
+        const formattedDate = new Date(Number(final.result[j].date));
+        const isoDateTime = formattedDate.toISOString();
+        final.result[j].date = isoDateTime;
+
         if (final.result[j].photos !== "") {
           const photoArr = [];
           const idUrl = final.result[j].photos.split(", ");
