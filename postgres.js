@@ -78,121 +78,129 @@ const Photo = sequelize.define("Photo", {
 });
 
 /* Characteristic Rating (1-5) Per Review */
-const Characteristic = sequelize.define("Characteristic", {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    allowNull: false,
+const Characteristic = sequelize.define(
+  "Characteristic",
+  {
+    review_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      allowNull: false,
+    },
+    size: {
+      type: DataTypes.SMALLINT,
+      allowNull: true,
+    },
+    fit: {
+      type: DataTypes.SMALLINT,
+      allowNull: true,
+    },
+    length: {
+      type: DataTypes.SMALLINT,
+      allowNull: true,
+    },
+    width: {
+      type: DataTypes.SMALLINT,
+      allowNull: true,
+    },
+    comfort: {
+      type: DataTypes.SMALLINT,
+      allowNull: true,
+    },
+    quality: {
+      type: DataTypes.SMALLINT,
+      allowNull: true,
+    },
   },
-  size: {
-    type: DataTypes.SMALLINT,
-    allowNull: false,
-  },
-  fit: {
-    type: DataTypes.SMALLINT,
-    allowNull: false,
-  },
-  length: {
-    type: DataTypes.SMALLINT,
-    allowNull: false,
-  },
-  width: {
-    type: DataTypes.SMALLINT,
-    allowNull: false,
-  },
-  comfort: {
-    type: DataTypes.SMALLINT,
-    allowNull: false,
-  },
-  quality: {
-    type: DataTypes.SMALLINT,
-    allowNull: false,
-  },
-});
+  { logging: false, timestamps: false }
+);
 
 /* Total Star Counts & Average Characteristics Ratings Per Product */
-const Meta = sequelize.define("Meta", {
-  product_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+const Meta = sequelize.define(
+  "Meta",
+  {
+    product_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    rating_1: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    rating_2: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    rating_3: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    rating_4: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    rating_5: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    recommended_t: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    recommended_f: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    size_id: {
+      type: DataTypes.SMALLINT,
+      allowNull: false,
+    },
+    fit_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    length_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    width_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    comfort_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    quality_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    size_avg: {
+      type: DataTypes.DECIMAL(16, 10),
+      allowNull: false,
+    },
+    fit_avg: {
+      type: DataTypes.DECIMAL(16, 10),
+      allowNull: false,
+    },
+    length_avg: {
+      type: DataTypes.DECIMAL(16, 10),
+      allowNull: false,
+    },
+    width_avg: {
+      type: DataTypes.DECIMAL(16, 10),
+      allowNull: false,
+    },
+    comfort_avg: {
+      type: DataTypes.DECIMAL(16, 10),
+      allowNull: false,
+    },
+    quality_avg: {
+      type: DataTypes.DECIMAL(16, 10),
+      allowNull: false,
+    },
   },
-  rating_1: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  rating_2: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  rating_3: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  rating_4: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  rating_5: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  recommended_t: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  recommended_f: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  size_id: {
-    type: DataTypes.SMALLINT,
-    allowNull: false,
-  },
-  fit_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  length_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  width_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  comfort_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  quality_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  size_avg: {
-    type: DataTypes.DECIMAL(16, 10),
-    allowNull: false,
-  },
-  fit_avg: {
-    type: DataTypes.DECIMAL(16, 10),
-    allowNull: false,
-  },
-  length_avg: {
-    type: DataTypes.DECIMAL(16, 10),
-    allowNull: false,
-  },
-  width_avg: {
-    type: DataTypes.DECIMAL(16, 10),
-    allowNull: false,
-  },
-  comfort_avg: {
-    type: DataTypes.DECIMAL(16, 10),
-    allowNull: false,
-  },
-  quality_avg: {
-    type: DataTypes.DECIMAL(16, 10),
-    allowNull: false,
-  },
-});
+  { logging: false, timestamps: false }
+);
 
 Meta.hasMany(Reviews, { foreignKey: "product_id" });
 Reviews.belongsTo(Meta, { foreignKey: "product_id" });
@@ -203,8 +211,8 @@ Reported.belongsTo(Reviews, { foreignKey: "review_id" });
 Reviews.hasOne(Helpful, { foreignKey: "review_id" });
 Helpful.belongsTo(Reviews, { foreignKey: "review_id" });
 
-Reviews.hasOne(Characteristic, { foreignKey: "review_id" });
-Characteristic.belongsTo(Reviews, { foreignKey: "review_id" });
+Meta.hasOne(Characteristic, { foreignKey: "product_id" });
+Characteristic.belongsTo(Meta, { foreignKey: "product_id" });
 
 Reviews.hasMany(Photo, { foreignKey: "review_id" });
 Photo.belongsTo(Reviews, { foreignKey: "review_id" });

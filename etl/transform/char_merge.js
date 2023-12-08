@@ -1,7 +1,5 @@
 const fs = require("fs");
 const csv = require("csv-parser");
-const results = [];
-
 const file1Data = {};
 const file2Data = [];
 
@@ -9,15 +7,6 @@ function mergeFiles() {
   if (file1Data && file2Data) {
     const mergedData = [];
     let counter = 0;
-
-    /*
-file1
-id: { id, product_id, name}
-
-file2
-{char_rev_id,characteristic_id,review_id,value}
-
-*/
     for (let i = 0; i < file2Data.length; i++) {
       const current = file2Data[i];
       mergedData.push(
