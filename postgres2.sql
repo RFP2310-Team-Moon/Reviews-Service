@@ -13,6 +13,8 @@ CREATE TABLE "reviews" (
   "response" TEXT DEFAULT '',
   "helpfulness" INT DEFAULT 0
 );
+CREATE INDEX idx_product_id ON reviews (product_id);
+
 
 DROP TABLE IF EXISTS "photos";
 CREATE TABLE "photos" (
@@ -22,6 +24,7 @@ CREATE TABLE "photos" (
     REFERENCES reviews(id),
   "url" TEXT
 );
+CREATE INDEX idx_review_id ON photos (review_id);
 
 DROP TABLE IF EXISTS "chars";
 CREATE TABLE "chars" (
@@ -43,7 +46,22 @@ CREATE TABLE "char_reviews" (
 );
 
 
+
 \copy reviews FROM '/Users/christianlee/hack-reactor/sdc/Reviews-Service/data/data/reviews.csv' CSV HEADER;
 \copy photos FROM '/Users/christianlee/hack-reactor/sdc/Reviews-Service/data/data/reviews_photos.csv' CSV HEADER;
 \copy chars FROM '/Users/christianlee/hack-reactor/sdc/Reviews-Service/data/data/characteristics.csv' CSV HEADER;
 \copy char_reviews FROM '/Users/christianlee/hack-reactor/sdc/Reviews-Service/data/data/characteristic_reviews.csv' CSV HEADER;
+
+
+
+-- ALTER TABLE reviews
+-- ADD COLUMN formatted_date TIMESTAMP WITH TIME ZONE;
+
+-- UPDATE reviews
+-- SET formatted_date =  TIME ZONE('UTC',TO_TIMESTAMP(date));
+
+-- ALTER TABLE reviews
+-- DROP COLUMN formatted_date;
+
+-- ALTER TABLE reviews
+-- RENAME COLUMN formatted_date TO date;
