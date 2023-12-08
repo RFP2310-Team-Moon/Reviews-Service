@@ -1,29 +1,14 @@
+require("dotenv").config();
 const express = require("express");
-const bodyParser = require("body-parser");
-const db = require("./db");
+const router = require("./router");
 
 const app = express();
+const port = process.env.PORT || 5432;
 
-app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
+app.use(express.json());
+app.use("/api", router);
 
-app.get("/", async (req, res) => {
-  try {
-    const qString = "SELECT * FROM REVIEWS LIMIT 10;";
-    const result = await db.query(qString);
-    console.log(result);
-    res.json(result.rows);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-app.listen(process.env.PORT, (err) => {
+app.listen(port, (err) => {
   if (err) {
     console.log("Error starting server");
   } else {
