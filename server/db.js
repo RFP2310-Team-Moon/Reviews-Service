@@ -8,6 +8,7 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: "postgres",
+    sync: true,
   }
 );
 
@@ -17,6 +18,7 @@ async function testConnection() {
     console.log("Connection has been established successfully.");
 
     await sequelize.sync();
+    // await sequelize.sync({ force: true });
     console.log("DB schema synced");
   } catch (err) {
     console.error("Unable to connect to the database:", err);

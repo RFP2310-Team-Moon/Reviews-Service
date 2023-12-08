@@ -133,3 +133,6 @@ dist
 .eslintrc.json
 
 .prettierrc
+
+/data
+*.csv
