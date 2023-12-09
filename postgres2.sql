@@ -38,6 +38,7 @@ CREATE TABLE "chars" (
   "product_id" INT,
   "name" TEXT
 );
+CREATE INDEX idx_chars_product_id ON chars (product_id);
 
 DROP TABLE IF EXISTS "char_reviews";
 CREATE TABLE "char_reviews" (
@@ -50,7 +51,7 @@ CREATE TABLE "char_reviews" (
     REFERENCES reviews(id),
   "value" SMALLINT CHECK (value > 0 AND value < 6)
 );
-
+CREATE INDEX idx_chars_product_id ON char_reviews (product_id);
 
 
 \copy reviews FROM '/Users/christianlee/hack-reactor/sdc/Reviews-Service/data/data/reviews.csv' CSV HEADER;
@@ -58,7 +59,22 @@ CREATE TABLE "char_reviews" (
 \copy chars FROM '/Users/christianlee/hack-reactor/sdc/Reviews-Service/data/data/characteristics.csv' CSV HEADER;
 \copy char_reviews FROM '/Users/christianlee/hack-reactor/sdc/Reviews-Service/data/data/characteristic_reviews.csv' CSV HEADER;
 
+/* MATERIALIZED VIEWS FOR AGGREGATED DATA */
+-- CREATE MATERIALIZED VIEW starCount
+-- AS SELECT product_id, rating, COUNT(rating)
+-- FROM reviews
+-- GROUP BY rating, product_id;
 
+-- CREATE MATERIALIZED VIEW recCount
+-- AS SELECT product_id, recommend, COUNT(recommend)
+-- FROM reviews
+-- GROUP BY recommend, product_id;
+
+-- CREATE MATERIALIZED VIEW avgRating
+-- AS SELECT product_id, c.id, c.name, AVG(cr.value)
+-- FROM chars as c, char_reviews as cr
+-- WHERE c.id = cr.characteristic_id
+-- GROUP BY c.name, c.id;
 
 -- ALTER TABLE reviews
 -- ADD COLUMN formatted_date TIMESTAMP WITH TIME ZONE;

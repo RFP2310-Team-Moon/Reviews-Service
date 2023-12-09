@@ -97,8 +97,75 @@ module.exports = {
   },
   getMetadata: async (req, res) => {
     try {
-      const result = await pool.query("SELECT * FROM reviews LIMIT 10;");
-      res.send(result.rows);
+      const { product_id } = req.query;
+      // Average Rating by Characteristics
+      // const qStringChar = `SELECT c.id, c.name, AVG(cr.value)
+      //   FROM chars as c
+      //   JOIN char_reviews as cr ON c.id = cr.characteristic_id
+      //   WHERE product_id=${product_id}
+      //   GROUP BY c.name, c.id
+      //   ORDER BY c.id;`;
+
+      const qStringChar = `SELECT id, name, avg
+        FROM avgRating
+        WHERE product_id=${product_id}
+        ORDER BY id;`;
+
+      // Star Rating Count
+      // const qStringRate = `SELECT rating, COUNT(rating)
+      //   FROM reviews
+      //   WHERE product_id=${product_id}
+      //   GROUP BY rating
+      //   ORDER BY rating ASC;`;
+
+      const qStringRate = `SELECT rating, count
+      FROM starCount
+      WHERE product_id=${product_id}
+      ORDER BY rating ASC;`;
+
+      // Recommended Count
+      // const qStringRec = `SELECT recommend, COUNT(recommend)
+      //   FROM reviews as r
+      //   WHERE product_id=${product_id}
+      //   GROUP BY recommend;`;
+
+      const qStringRec = `SELECT recommend, count
+        FROM recCount
+        WHERE product_id=${product_id}`;
+
+      const result1 = await pool.query(qStringChar);
+      const result2 = await pool.query(qStringRate);
+      const result3 = await pool.query(qStringRec);
+      console.log(result1.rows);
+      console.log(result2.rows);
+      console.log(result3.rows);
+
+      const characteristics = {};
+      result1.rows.forEach((char) => {
+        characteristics[char.name] = {
+          id: char.id,
+          value: char.avg,
+        };
+      });
+
+      const ratings = {};
+      result2.rows.forEach((rating) => {
+        ratings[rating.rating] = rating.count;
+      });
+
+      const recommended = {};
+      result3.rows.forEach((rec) => {
+        recommended[rec.recommend] = rec.count;
+      });
+
+      const result = {
+        product_id,
+        ratings,
+        recommended,
+        characteristics,
+      };
+
+      res.send(result);
     } catch (err) {
       console.error(err);
     }
