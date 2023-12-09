@@ -68,24 +68,29 @@ module.exports = {
 
       const result = await pool.query(qString);
       console.log("INSERTED", req.query);
-      res.status(200).send(result.rows);
+      res.sendStatus(200);
     } catch (err) {
       console.error(err);
     }
   },
   report: async (req, res) => {
     try {
-      const result = await pool.query("SELECT * FROM reviews LIMIT 10;");
-      res.send(result.rows);
+      const { review_id } = req.params;
+      const qString = `UPDATE reviews SET reported = true WHERE id=${review_id};`;
+      await pool.query(qString);
+      console.log(`Review id: ${review_id} reported successfully`);
+      res.sendStatus(200);
     } catch (err) {
       console.error(err);
     }
   },
   markHelpful: async (req, res) => {
     try {
-      const qString = `UPDATE reviews SET helpful = helpful + 1 WHERE id=${req.query.review_id};`;
-      const result = await pool.query(qString);
-      res.send(result.rows);
+      const { review_id } = req.params;
+      const qString = `UPDATE reviews SET helpfulness = helpfulness + 1 WHERE id=${review_id};`;
+      await pool.query(qString);
+      console.log("Helpful +1 for Review id", review_id);
+      res.sendStatus(200);
     } catch (err) {
       console.error(err);
     }
