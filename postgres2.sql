@@ -15,6 +15,12 @@ CREATE TABLE "reviews" (
 );
 CREATE INDEX idx_product_id ON reviews (product_id);
 
+-- UPDATE THE ID TO START WITH 1 + last id
+-- GET last id
+--- select id from reviews order by id desc limit 5;
+-- QUERY FOR TO GET ALL SEQUENCES
+--- SELECT * FROM pg_sequences Review-#;
+-- ALTER SEQUENCE reviews_id_seq RESTART WITH 5774953;
 
 DROP TABLE IF EXISTS "photos";
 CREATE TABLE "photos" (

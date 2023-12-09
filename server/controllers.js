@@ -5,19 +5,6 @@ module.exports = {
       const productId = req.query.product_id;
       const page = req.query.page || 1;
       const count = req.query.count || 5;
-      // // CONCAT ALL PHOTO URLS BY REVIEW ID
-      // const qString2 = `SELECT STRING_AGG(id || ', ' || url ,', '), review_id
-      // FROM photos
-      // WHERE review_id
-      // IN (SELECT id
-      // FROM reviews
-      // WHERE product_id=${productId}
-      // ORDER BY date ASC
-      // LIMIT ${count}
-      // OFFSET ${(page - 1) * count})
-      // GROUP BY review_id;`;
-      // STRING_AGG('{"id":' || p.id || ', "url":"' || p.url || '"}',', ') as photos
-
       const qString3 = `SELECT reviews.id as review_id,
         rating,
         summary,
@@ -61,16 +48,27 @@ module.exports = {
         }
       }
 
-      res.send(final);
+      res.status(200).send(final);
     } catch (err) {
       console.error(err);
     }
   },
   postReview: async (req, res) => {
     try {
-      const qString = "SELECT * FROM reviews LIMIT 10;";
-      const result = await pool.query();
-      res.send(result.rows);
+      const keys = Object.keys(req.query);
+      if (keys.indexOf("name") !== -1) {
+        keys[keys.indexOf("name")] = "reviewer_name";
+      }
+      if (keys.indexOf("email") !== -1) {
+        keys[keys.indexOf("email")] = "reviewer_email";
+      }
+
+      const qString = `INSERT INTO reviews (${keys})
+        VALUES (${Object.values(req.query)});`;
+
+      const result = await pool.query(qString);
+      console.log("INSERTED", req.query);
+      res.status(200).send(result.rows);
     } catch (err) {
       console.error(err);
     }
@@ -85,7 +83,8 @@ module.exports = {
   },
   markHelpful: async (req, res) => {
     try {
-      const result = await pool.query("SELECT * FROM reviews LIMIT 10;");
+      const qString = `UPDATE reviews SET helpful = helpful + 1 WHERE id=${req.query.review_id};`;
+      const result = await pool.query(qString);
       res.send(result.rows);
     } catch (err) {
       console.error(err);
