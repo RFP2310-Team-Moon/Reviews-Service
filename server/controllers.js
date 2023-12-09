@@ -98,47 +98,28 @@ module.exports = {
   getMetadata: async (req, res) => {
     try {
       const { product_id } = req.query;
-      // Average Rating by Characteristics
-      // const qStringChar = `SELECT c.id, c.name, AVG(cr.value)
-      //   FROM chars as c
-      //   JOIN char_reviews as cr ON c.id = cr.characteristic_id
-      //   WHERE product_id=${product_id}
-      //   GROUP BY c.name, c.id
-      //   ORDER BY c.id;`;
 
+      // Average Rating by Characteristics
       const qStringChar = `SELECT id, name, avg
         FROM avgRating
         WHERE product_id=${product_id}
         ORDER BY id;`;
 
       // Star Rating Count
-      // const qStringRate = `SELECT rating, COUNT(rating)
-      //   FROM reviews
-      //   WHERE product_id=${product_id}
-      //   GROUP BY rating
-      //   ORDER BY rating ASC;`;
+      const qStringRate = `SELECT product_id, rating, COUNT(rating)
+        FROM reviews
+        WHERE product_id=${product_id}
+        GROUP BY rating, product_id;`;
 
-      const qStringRate = `SELECT rating, count
-      FROM starCount
-      WHERE product_id=${product_id}
-      ORDER BY rating ASC;`;
-
-      // Recommended Count
-      // const qStringRec = `SELECT recommend, COUNT(recommend)
-      //   FROM reviews as r
-      //   WHERE product_id=${product_id}
-      //   GROUP BY recommend;`;
-
-      const qStringRec = `SELECT recommend, count
-        FROM recCount
-        WHERE product_id=${product_id}`;
+      // Rec Count
+      const qStringRec = `SELECT recommend, COUNT(recommend)
+        FROM reviews
+        WHERE product_id=${product_id}
+        GROUP BY product_id, recommend;`;
 
       const result1 = await pool.query(qStringChar);
       const result2 = await pool.query(qStringRate);
       const result3 = await pool.query(qStringRec);
-      console.log(result1.rows);
-      console.log(result2.rows);
-      console.log(result3.rows);
 
       const characteristics = {};
       result1.rows.forEach((char) => {
