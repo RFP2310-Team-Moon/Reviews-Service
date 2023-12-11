@@ -98,19 +98,16 @@ module.exports = {
   getMetadata: async (req, res) => {
     try {
       const { product_id } = req.query;
-
       // Average Rating by Characteristics
       const qStringChar = `SELECT id, name, avg
         FROM avgRating
         WHERE product_id=${product_id}
         ORDER BY id;`;
-
       // Star Rating Count
       const qStringRate = `SELECT product_id, rating, COUNT(rating)
         FROM reviews
         WHERE product_id=${product_id}
         GROUP BY rating, product_id;`;
-
       // Rec Count
       const qStringRec = `SELECT recommend, COUNT(recommend)
         FROM reviews

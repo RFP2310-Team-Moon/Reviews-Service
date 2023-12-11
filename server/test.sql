@@ -13,6 +13,7 @@ SELECT id, name, avg
   WHERE product_id=12
   ORDER BY id;
 
+DROP MATERIALIZED VIEW IF EXISTS starcount ;
 
 /* STAR COUNT */
 -- EXPLAIN ANALYZE

@@ -14,6 +14,7 @@ CREATE TABLE "reviews" (
   "helpfulness" INT DEFAULT 0
 );
 CREATE INDEX idx_product_id ON reviews (product_id);
+CREATE INDEX idx_avgRating_product_id ON avgRating (product_id);
 
 -- UPDATE THE ID TO START WITH 1 + last id
 -- GET last id
