@@ -3,7 +3,7 @@ const { Photo } = require("./postgres.js");
 const fs = require("fs");
 const csv = require("csv-parser");
 
-const batchSize = 1000; // Adjust batch size as needed
+const batchSize = 1000;
 let transformedData = [];
 let rowCount = 0;
 
@@ -26,22 +26,19 @@ async function insertBatchIntoDatabase(data) {
 fs.createReadStream("./data/reviews_photos.csv")
   .pipe(csv())
   .on("data", (row) => {
-    // Transform data and add to the array
-    const transformedRow = transformRow(row); // Use your transformation logic
+    const transformedRow = transformRow(row);
     transformedData.push(transformedRow);
 
     rowCount++;
 
-    // If batch size is reached, insert into the database
     if (transformedData.length >= batchSize) {
-      insertBatchIntoDatabase([...transformedData]); // Insert a copy of the array
-      transformedData = []; // Clear the array for the next batch
+      insertBatchIntoDatabase([...transformedData]);
+      transformedData = [];
     }
   })
   .on("end", () => {
-    // Insert remaining data (if any)
     if (transformedData.length > 0) {
-      insertBatchIntoDatabase([...transformedData]); // Insert a copy of the remaining data
+      insertBatchIntoDatabase([...transformedData]);
     }
     console.log(`Total rows processed: ${rowCount}`);
     console.log("CSV file processing completed");
