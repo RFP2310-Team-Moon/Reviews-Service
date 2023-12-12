@@ -11,7 +11,7 @@ module.exports = {
       const productId = req.query.product_id;
       const page = req.query.page || 1;
       const count = req.query.count || 5;
-      let final;
+
       // if (cache.getReviews[productId + page + count]) {
       //   final = cache.getReviews[productId];
       // } else {
@@ -33,7 +33,7 @@ module.exports = {
           LIMIT ${count}
           OFFSET ${(page - 1) * count};`;
       const result3 = await pool.query(qString3);
-      final = {
+      const final = {
         product: productId,
         page,
         count,
@@ -56,9 +56,6 @@ module.exports = {
           final.result[j].photos = photoArr;
         }
       }
-      // cache.getReviews[productId + "-" + page + "-" + count] = final;
-      // }
-      // console.log(cache.getReviews);
       res.status(200).send(final);
     } catch (err) {
       console.error(err);
@@ -83,6 +80,7 @@ module.exports = {
         console.log("Photos Incorrect Format");
         res.sendStatus(500);
       }
+      console.log(photos);
       for (let i = 0; i < photos.length; i += 1) {
         if (typeof photos[i] !== "string") {
           console.log("Photo link is not a string:", photos[i]);
@@ -90,10 +88,17 @@ module.exports = {
         }
       }
 
+      /* INSERT CHARACTERISTICS */
+      const qStringChar = `SELECT id FROM chars WHERE product_id=${req.query.product_id}`;
+      let charIds = await pool.query(qStringChar);
+      charIds = charIds.rows.map((id) => String(id.id));
+      let charRating = req.query.characteristics;
+      charRating = JSON.parse(charRating);
+      delete req.query.characteristics;
+
       /* CHAR VALIDATION */
-      const params = req.query;
-      delete params.photos;
-      const keys = Object.keys(params);
+      delete req.query.photos;
+      const keys = Object.keys(req.query);
       if (keys.indexOf("name") !== -1) {
         keys[keys.indexOf("name")] = "reviewer_name";
       }
@@ -103,19 +108,31 @@ module.exports = {
 
       /* INSERT TEXT */
       const qStringReviews = `INSERT INTO reviews (${keys})
-        VALUES (${Object.values(params)})
-        RETURNING id;`;
+      VALUES (${Object.values(req.query)})
+      RETURNING id;`;
       const result = await pool.query(qStringReviews);
 
       /* INSERT PHOTOS */
-      const photoInsert = photos.map((url) => [String(result.rows[0].id), url]);
-      const photoInsertQuery = {
-        text: `INSERT INTO photos (review_id, url) VALUES ($1, $2);`,
-        values: photoInsert.length === 1 ? photoInsert[0] : photoInsert,
-      };
-      await pool.query(photoInsertQuery);
+      const reviewId = result.rows[0].id;
+      const photoInsert = photos.map((url) => `('${reviewId}', '${url}')`);
+      const photoInsertTransformed = photoInsert.join(",");
+      await pool.query(
+        `INSERT INTO photos (review_id, url) VALUES ${photoInsertTransformed};`
+      );
 
-      console.log("INSERTED", req.query);
+      const charKeys = Object.keys(charRating);
+      const charInsertVal = [];
+      for (let i = 0; i < charKeys.length; i += 1) {
+        if (charIds.indexOf(charKeys[i]) !== -1) {
+          charInsertVal.push(
+            `('${charKeys[i]}', '${reviewId}', ${charRating[charKeys[i]]})`
+          );
+        }
+      }
+      const charValuesTransformed = charInsertVal.join(",");
+      await pool.query(
+        `INSERT INTO char_reviews (characteristic_id, review_id, value) VALUES ${charValuesTransformed};`
+      );
       res.sendStatus(200);
     } catch (err) {
       console.error(err);
