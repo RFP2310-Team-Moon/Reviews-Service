@@ -22,6 +22,7 @@ CREATE INDEX idx_avgRating_product_id ON avgRating (product_id);
 -- QUERY FOR TO GET ALL SEQUENCES
 --- SELECT * FROM pg_sequences Review-#;
 -- ALTER SEQUENCE reviews_id_seq RESTART WITH 5774953;
+ALTER SEQUENCE photos_id_seq RESTART WITH 2742541;
 
 DROP TABLE IF EXISTS "photos";
 CREATE TABLE "photos" (

@@ -1,35 +1,44 @@
 const { pool } = require("./db");
+
+const cache = {
+  getReviews: {},
+  getMetadata: {},
+};
+
 module.exports = {
   getReviews: async (req, res) => {
     try {
       const productId = req.query.product_id;
       const page = req.query.page || 1;
       const count = req.query.count || 5;
+      let final;
+      // if (cache.getReviews[productId + page + count]) {
+      //   final = cache.getReviews[productId];
+      // } else {
       const qString3 = `SELECT reviews.id as review_id,
-        rating,
-        summary,
-        recommend,
-        response,
-        body,
-        date,
-        reviewer_name,
-        helpfulness,
-        STRING_AGG(p.id || ', ' || p.url ,', ') as photos
-        FROM reviews
-        JOIN photos as p ON reviews.id=p.review_id
-        WHERE reviews.product_id=${productId}
-        GROUP BY reviews.id
-        ORDER BY date ASC
-        LIMIT ${count}
-        OFFSET ${(page - 1) * count};`;
+          rating,
+          summary,
+          recommend,
+          response,
+          body,
+          date,
+          reviewer_name,
+          helpfulness,
+          STRING_AGG(p.id || ', ' || p.url ,', ') as photos
+          FROM reviews
+          JOIN photos as p ON reviews.id=p.review_id
+          WHERE reviews.product_id=${productId}
+          GROUP BY reviews.id
+          ORDER BY date ASC
+          LIMIT ${count}
+          OFFSET ${(page - 1) * count};`;
       const result3 = await pool.query(qString3);
-      const final = {
+      final = {
         product: productId,
         page,
         count,
         result: result3.rows,
       };
-
       for (let j = 0; j < final.result.length; j += 1) {
         const formattedDate = new Date(Number(final.result[j].date));
         const isoDateTime = formattedDate.toISOString();
@@ -47,7 +56,9 @@ module.exports = {
           final.result[j].photos = photoArr;
         }
       }
-
+      // cache.getReviews[productId + "-" + page + "-" + count] = final;
+      // }
+      // console.log(cache.getReviews);
       res.status(200).send(final);
     } catch (err) {
       console.error(err);
@@ -55,7 +66,34 @@ module.exports = {
   },
   postReview: async (req, res) => {
     try {
-      const keys = Object.keys(req.query);
+      /* EMAIL VALIDATION */
+      const mailFormat = /\S+@\S+\.\S+/;
+      if (
+        typeof req.query.email !== "string" ||
+        !req.query.email.match(mailFormat)
+      ) {
+        console.log("invalid email");
+        res.sendStatus(500);
+      }
+
+      /* PHOTO VALIDATION */
+      let photos = req.query.photos.replace(/'/g, '"');
+      photos = JSON.parse(photos);
+      if (!Array.isArray(photos)) {
+        console.log("Photos Incorrect Format");
+        res.sendStatus(500);
+      }
+      for (let i = 0; i < photos.length; i += 1) {
+        if (typeof photos[i] !== "string") {
+          console.log("Photo link is not a string:", photos[i]);
+          res.sendStatus(500);
+        }
+      }
+
+      /* CHAR VALIDATION */
+      const params = req.query;
+      delete params.photos;
+      const keys = Object.keys(params);
       if (keys.indexOf("name") !== -1) {
         keys[keys.indexOf("name")] = "reviewer_name";
       }
@@ -63,10 +101,20 @@ module.exports = {
         keys[keys.indexOf("email")] = "reviewer_email";
       }
 
-      const qString = `INSERT INTO reviews (${keys})
-        VALUES (${Object.values(req.query)});`;
+      /* INSERT TEXT */
+      const qStringReviews = `INSERT INTO reviews (${keys})
+        VALUES (${Object.values(params)})
+        RETURNING id;`;
+      const result = await pool.query(qStringReviews);
 
-      const result = await pool.query(qString);
+      /* INSERT PHOTOS */
+      const photoInsert = photos.map((url) => [String(result.rows[0].id), url]);
+      const photoInsertQuery = {
+        text: `INSERT INTO photos (review_id, url) VALUES ($1, $2);`,
+        values: photoInsert.length === 1 ? photoInsert[0] : photoInsert,
+      };
+      await pool.query(photoInsertQuery);
+
       console.log("INSERTED", req.query);
       res.sendStatus(200);
     } catch (err) {

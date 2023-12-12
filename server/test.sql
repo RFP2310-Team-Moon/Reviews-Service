@@ -54,3 +54,23 @@ const qStringRate = `SELECT rating, COUNT(rating)
   WHERE product_id=${product_id}
   GROUP BY rating
   ORDER BY rating ASC;`;
+
+
+
+ EXPLAIN ANALYZE
+  SELECT reviews.id as review_id,
+          rating,
+          summary,
+          recommend,
+          response,
+          body,
+          date,
+          reviewer_name,
+          helpfulness,
+          STRING_AGG(p.id || ', ' || p.url ,', ') as photos
+          FROM reviews
+          JOIN photos as p ON reviews.id=p.review_id
+          WHERE reviews.product_id=18
+          GROUP BY reviews.id
+          ORDER BY date ASC
+          LIMIT 5;
