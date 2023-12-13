@@ -1,5 +1,10 @@
 const router = require("express").Router();
 const controllers = require("./controllers");
+require("dotenv").config();
+
+router
+  .route(`/${process.env.LOADER_IO}`)
+  .get(controllers.loaderIO.getVerification);
 
 router.route("/reviews").get(controllers.getReviews);
 router.route("/reviews").post(controllers.postReview);
