@@ -15,11 +15,12 @@ module.exports = {
     try {
       const productId =
         req.query.product_id || Math.floor(Math.random() * 100000) + 1;
-      console.log(productId);
+      console.log("P ID:", productId);
       const page = req.query.page || 1;
       const count = req.query.count || 5;
-
-      const qString = `SELECT reviews.id as review_id,
+      const sort = req.query.sort || "newest";
+      const qStrings = {
+        newest: `SELECT reviews.id as review_id,
           rating,
           summary,
           recommend,
@@ -33,10 +34,45 @@ module.exports = {
           JOIN photos as p ON reviews.id=p.review_id
           WHERE reviews.product_id=${productId}
           GROUP BY reviews.id
-          ORDER BY date ASC
+          ORDER BY date DESC
           LIMIT ${count}
-          OFFSET ${(page - 1) * count};`;
-      const result = await pool.query(qString);
+          OFFSET ${(page - 1) * count};`,
+        helpful: `SELECT reviews.id as review_id,
+          rating,
+          summary,
+          recommend,
+          response,
+          body,
+          date,
+          reviewer_name,
+          helpfulness,
+          STRING_AGG(p.id || ', ' || p.url ,', ') as photos
+          FROM reviews
+          JOIN photos as p ON reviews.id=p.review_id
+          WHERE reviews.product_id=${productId}
+          GROUP BY reviews.id
+          ORDER BY helpfulness DESC
+          LIMIT ${count}
+          OFFSET ${(page - 1) * count};`,
+        relevant: `SELECT reviews.id as review_id,
+          rating,
+          summary,
+          recommend,
+          response,
+          body,
+          date,
+          reviewer_name,
+          helpfulness,
+          STRING_AGG(p.id || ', ' || p.url ,', ') as photos
+          FROM reviews
+          JOIN photos as p ON reviews.id=p.review_id
+          WHERE reviews.product_id=${productId}
+          GROUP BY reviews.id
+          ORDER BY helpfulness DESC, Date ASC
+          LIMIT ${count}
+          OFFSET ${(page - 1) * count};`,
+      };
+      const result = await pool.query(qStrings[sort]);
       const final = {
         product: productId,
         page,
