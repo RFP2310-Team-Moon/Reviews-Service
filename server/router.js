@@ -3,7 +3,7 @@ const controllers = require("./controllers");
 require("dotenv").config();
 
 router
-  .route(`/${process.env.LOADER_IO}`)
+  .route(`/${process.env.LOADER}`)
   .get(controllers.loaderIO.getVerification);
 
 router.route("/reviews").get(controllers.getReviews);
