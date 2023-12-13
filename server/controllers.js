@@ -13,11 +13,13 @@ module.exports = {
   },
   getReviews: async (req, res) => {
     try {
-      const productId = req.query.product_id;
+      const productId =
+        req.query.product_id || Math.floor(Math.random() * 100000) + 1;
+      console.log(productId);
       const page = req.query.page || 1;
       const count = req.query.count || 5;
 
-      const qString3 = `SELECT reviews.id as review_id,
+      const qString = `SELECT reviews.id as review_id,
           rating,
           summary,
           recommend,
@@ -34,12 +36,12 @@ module.exports = {
           ORDER BY date ASC
           LIMIT ${count}
           OFFSET ${(page - 1) * count};`;
-      const result3 = await pool.query(qString3);
+      const result = await pool.query(qString);
       const final = {
         product: productId,
         page,
         count,
-        result: result3.rows,
+        result: result.rows,
       };
       for (let j = 0; j < final.result.length; j += 1) {
         const formattedDate = new Date(Number(final.result[j].date));
