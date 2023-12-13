@@ -15,6 +15,7 @@ module.exports = {
     try {
       const productId =
         req.query.product_id || Math.floor(Math.random() * 100000) + 1;
+      console.log(productId);
       const page = req.query.page || 1;
       const count = req.query.count || 5;
 
