@@ -1,20 +1,21 @@
 const { pool } = require("./db");
 
-const cache = {
-  getReviews: {},
-  getMetadata: {},
-};
-
 module.exports = {
+  loaderIO: {
+    getVerification: async (req, res) => {
+      try {
+        res.status(200).send(process.env.LOADER);
+      } catch {
+        res.status(500).send();
+      }
+    },
+  },
   getReviews: async (req, res) => {
     try {
       const productId = req.query.product_id;
       const page = req.query.page || 1;
       const count = req.query.count || 5;
 
-      // if (cache.getReviews[productId + page + count]) {
-      //   final = cache.getReviews[productId];
-      // } else {
       const qString3 = `SELECT reviews.id as review_id,
           rating,
           summary,
