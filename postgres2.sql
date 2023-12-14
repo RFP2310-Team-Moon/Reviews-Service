@@ -49,7 +49,7 @@ CREATE TABLE "char_reviews" (
 \copy chars FROM 'data/characteristics.csv' CSV HEADER;
 \copy char_reviews FROM 'data/characteristic_reviews.csv' CSV HEADER;
 
-\copy reviews FROM 'data/output101.csv' CSV HEADER;
+\copy reviews FROM 'data' CSV HEADER;
 
 /* CREATE INDEXES */
 CREATE INDEX idx_product_id ON reviews (product_id);
@@ -63,10 +63,10 @@ CREATE INDEX idx_rating ON reviews (rating);
 CREATE INDEX idx_recommend ON reviews (recommend);
 
 /* UPDATE SEQUENCES */
-ALTER SEQUENCE reviews_id_seq RESTART WITH 5774953;
+
 ALTER SEQUENCE photos_id_seq RESTART WITH 2742541;
 ALTER SEQUENCE char_reviews_id_seq RESTART WITH 19327576;
-
+ALTER SEQUENCE reviews_id_seq RESTART WITH 5774953;
 
 -- UPDATE THE ID TO START WITH 1 + last id
 -- GET last id
@@ -111,7 +111,7 @@ REFRESH MATERIALIZED VIEW avgRating;
 
 /Users/christianlee/hack-reactor/sdc/Reviews-Service/data/raw/characteristic_reviews.csv
 
-scp -i SDC.pem ~/hack-reactor/sdc/Reviews-Service/data/raw/output100.csv ubuntu@ec2-107-20-23-72.compute-1.amazonaws.com:~/Reviews-Service/data
+scp -i SDC.pem ~/hack-reactor/sdc/Reviews-Service/data/raw/characteristic_reviews.csv ubuntu@ec2-34-228-60-210.compute-1.amazonaws.com:~/Reviews-Service/data/
 
 
 data/raw/characteristics.csv
