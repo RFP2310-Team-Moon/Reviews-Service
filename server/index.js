@@ -12,6 +12,6 @@ app.listen(port, (err) => {
   if (err) {
     console.log("Error starting server");
   } else {
-    console.log("Server running on port: ", process.env.PORT);
+    console.log("Server running on port: ", port);
   }
 });
