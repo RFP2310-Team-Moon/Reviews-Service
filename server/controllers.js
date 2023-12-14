@@ -16,7 +16,7 @@ module.exports = {
       // TOTAL PRODUCTS: 5775026
       const productId =
         req.query.product_id || Math.floor(Math.random() * 577502) + 5197523;
-      console.log("P ID:", productId);
+      console.log("Rev P-ID:", productId);
       const page = req.query.page || 1;
       const count = req.query.count || 5;
       const sort = req.query.sort || "newest";
@@ -208,6 +208,7 @@ module.exports = {
     try {
       const product_id =
         req.query.product_id || Math.floor(Math.random() * 100000) + 900000;
+      console.log("Meta P-ID:", product_id);
       // Average Rating by Characteristics
       const qStringChar = `SELECT id, name, avg
         FROM avgRating
