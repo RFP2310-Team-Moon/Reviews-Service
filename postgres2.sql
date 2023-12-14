@@ -59,6 +59,9 @@ CREATE INDEX idx_chars_product_id ON chars (product_id);
 CREATE INDEX idx_review_id ON photos (review_id);
 CREATE INDEX idx_date ON reviews (date);
 
+CREATE INDEX idx_rating ON reviews (rating);
+CREATE INDEX idx_recommend ON reviews (recommend);
+
 /* UPDATE SEQUENCES */
 ALTER SEQUENCE reviews_id_seq RESTART WITH 5774953;
 ALTER SEQUENCE photos_id_seq RESTART WITH 2742541;
