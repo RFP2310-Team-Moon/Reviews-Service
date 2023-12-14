@@ -13,8 +13,9 @@ module.exports = {
   },
   getReviews: async (req, res) => {
     try {
+      // TOTAL PRODUCTS: 5775026
       const productId =
-        req.query.product_id || Math.floor(Math.random() * 100000) + 1;
+        req.query.product_id || Math.floor(Math.random() * 577502) + 5197523;
       console.log("P ID:", productId);
       const page = req.query.page || 1;
       const count = req.query.count || 5;
@@ -103,6 +104,10 @@ module.exports = {
   },
   postReview: async (req, res) => {
     try {
+      // console.log(req.body, req.params, req.query);
+      // if (req.params !== {}) {
+      //   req.query = req.params;
+      // }
       /* EMAIL VALIDATION */
       const mailFormat = /\S+@\S+\.\S+/;
       if (
@@ -120,7 +125,6 @@ module.exports = {
         console.log("Photos Incorrect Format");
         res.sendStatus(500);
       }
-      console.log(photos);
       for (let i = 0; i < photos.length; i += 1) {
         if (typeof photos[i] !== "string") {
           console.log("Photo link is not a string:", photos[i]);
@@ -202,7 +206,8 @@ module.exports = {
   },
   getMetadata: async (req, res) => {
     try {
-      const { product_id } = req.query;
+      const product_id =
+        req.query.product_id || Math.floor(Math.random() * 100000) + 900000;
       // Average Rating by Characteristics
       const qStringChar = `SELECT id, name, avg
         FROM avgRating
